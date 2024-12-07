@@ -6,6 +6,22 @@ import {db} from "./data/db"
 function App() {
   //State
   const [ data, setData] = useState(db);
+  const [cart, setCart] = useState([]);
+
+  //funciones descriptivas
+  function addToCart(item){
+    const itemExist = cart.findIndex(guitar=>guitar.id===item.id);
+    
+    if(itemExist >= 0){
+      const updateCart = [...cart];
+      updateCart[itemExist].quantity++;
+      setCart[updateCart]
+    }else{
+      item.quantity = 1;
+      
+      setCart([...cart, item])      
+    }
+  }
 
   useEffect(()=>{
     setData(db)
@@ -19,7 +35,9 @@ function App() {
     <>
       <div>
     {/* Se renderiza el componente header */}
-    <Header />    
+    <Header 
+      cart={cart}
+    />    
     
     <main className="container-xl mt-5">
         <h2 className="text-center">Nuestra Colección</h2>
@@ -30,6 +48,8 @@ function App() {
                 <Guitar
                   key={guitar.id}
                   guitar={guitar}
+                  setCart ={setCart}
+                  addToCart={addToCart}
                 />
               )
             })}
