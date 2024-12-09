@@ -2,12 +2,10 @@
 //import {Fragment} from 'react'
 //importar fragment de react
 //<> </>
-import { useMemo } from "react"
-export default function Header({ cart, removeFromCart, increseQuantity,decreseQuantity,emptyCart}) {
+export default function Header({ cart, removeFromCart, increseQuantity,decreseQuantity,emptyCart,cartTotal,isEmpty}) {
     //Funciones variables states etc..
     // const user = 'Vera';
-    const isEmpty = useMemo( () => cart.length === 0, [cart] )//State derivado
-    const cartTotal =useMemo( () => cart.reduce((total, item)=> total + (item.quantity * item.price),0), [cart])
+    
     return (
         //Elemento en el nivel maximo <header> que retornara el html 
         <header className="py-5 header">
