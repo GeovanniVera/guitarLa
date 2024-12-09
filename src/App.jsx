@@ -4,15 +4,24 @@ import Guitar from "./components/Guitar";
 import { db } from "./data/db";
 
 function App() {
+
+  const initialCart = () => {
+    const localStorageCart = localStorage.getItem('cart');
+    return localStorageCart ? JSON.parse(localStorageCart) : [];
+  }
   // State
   const [data, setData] = useState(db);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(initialCart);
+
+  const MAX_ITEMS = 5;
+  const MIN_ITEMS = 1;
 
   // Funciones descriptivas
   function addToCart(item) {
     const itemExist = cart.findIndex(guitar => guitar.id === item.id);
 
     if (itemExist >= 0) {
+      if(cart[itemExist].quantity >= MAX_ITEMS) return
       // Si el item ya existe, lo actualizamos
       const updateCart = [...cart]; // Creamos una copia del carrito
       updateCart[itemExist].quantity++; // Incrementamos la cantidad
@@ -24,15 +33,58 @@ function App() {
     }
   }
 
+
+  function removeFromCart(id){
+    setCart(prevCart=>prevCart.filter(guitar => guitar.id != id))
+  }
+
+  function increseQuantity(id){
+    const updateCart = cart.map(item => {
+      if(item.id === id && item.quantity < MAX_ITEMS){
+        return {
+          ...item,
+          quantity : item.quantity + 1
+        }
+      }
+      return item
+    })
+    setCart(updateCart)
+  }
+
+  function decreseQuantity(id){
+    const updateCart = cart.map(item => {
+      if(item.id === id && item.quantity > MIN_ITEMS){
+
+          return {
+            ...item,
+            quantity : item.quantity - 1
+          
+        }
+      }
+      return item
+    })
+    setCart(updateCart)
+  }
+
+  function emptyCart(e){
+    setCart([])
+  }
   useEffect(() => {
     setData(db);
-  }, []);
+    localStorage.setItem('cart',JSON.stringify(cart));
+  }, [cart]);
 
   return (
     <>
       <div>
         {/* Se renderiza el componente Header */}
-        <Header cart={cart} />    
+        <Header 
+        cart={cart} 
+        removeFromCart={removeFromCart}
+        increseQuantity={increseQuantity}
+        decreseQuantity={decreseQuantity}
+        emptyCart={emptyCart}
+        />    
 
         <main className="container-xl mt-5">
           <h2 className="text-center">Nuestra Colección</h2>
@@ -45,6 +97,7 @@ function App() {
                   guitar={guitar}
                   setCart={setCart}
                   addToCart={addToCart}
+
                 />
               );
             })}
